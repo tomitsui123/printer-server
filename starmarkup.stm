@@ -1,0 +1,4 @@
+[image: url "public/images/receipt.png";
+        width 40%;
+        min-width 30mm]\
+[cut: feed; partial]
