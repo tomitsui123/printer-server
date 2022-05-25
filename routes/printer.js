@@ -56,17 +56,16 @@ router.post('/', async (req, res, next) => {
     }
   }
   */
-  const { t: timestamp } = req.query
-  const { printerMAC, status, statusCode, printingInProgress, clientAction } = req.body
-  console.log(timestamp)
+  // const { t: timestamp } = req.query
+  // const { printerMAC, status, statusCode, printingInProgress, clientAction } = req.body
+  // console.log(timestamp)
   let mediaTypes = ["application/vnd.star.line", "application/vnd.star.linematrix",
     "application/vnd.star.starprnt", "application/vnd.star.starprntcore", "text/vnd.star.markup"]
   const currentOrder = pendingOrder.shift()
-  console.log(currentOrder)
   let jobReady = false
   if (currentOrder) {
     jobReady = true
-    createReceiptCanvas(currentOrder, '取消')
+    createReceiptCanvas(currentOrder.order, currentOrder.status)
   }
   res.send({
     jobReady,
@@ -92,7 +91,7 @@ router.get('/', async (req, res, next) => {
 router.post('/print', (req, res) => {
   console.log(req.body)
   // jobReady = true
-  pendingOrder.push(req.body.order)
+  pendingOrder.push(req.body)
 
   return res.send({ pendingOrder })
 })
