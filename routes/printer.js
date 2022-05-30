@@ -1,6 +1,5 @@
 var express = require('express')
 const { execSync } = require('child_process')
-const { createCanvas } = require('canvas')
 const { createReceiptCanvas } = require('../controller/createReceipt')
 
 var router = express.Router()
@@ -16,12 +15,6 @@ Database printer:
 6. lastPoll
 7. branchID
 8. uid -> uuid v4
- */
-
-
-/*
-Database receipt template:
-
  */
 
 router.post('/', async (req, res, next) => {
@@ -89,10 +82,26 @@ router.get('/', async (req, res, next) => {
 })
 
 router.post('/print', (req, res) => {
-  console.log(req.body)
+  const { printerInfo, status, order } = req.body
+  const { categoryList: needToBePrintedCategory, needSeparate } = printerInfo
   // jobReady = true
-  pendingOrder.push(req.body)
-
+  // pendingOrder.push(req.body)
+  if (needSeparate) {
+    const temp = []
+    for (let catId of needToBePrintedCategory) {
+      const filteredDetails = order.details.filter(e => catId === e.categoryId)
+      if (filteredDetails.length > 0) {
+        const filteredData = { order: { ...order, details: filteredDetails }, status }
+        pendingOrder.push(filteredData)
+      }
+    }
+    // console.log(temp)
+    // pendingOrder.concat(...temp)
+  } else {
+    const filteredDetails = order.details.filter(e => needToBePrintedCategory.includes(e.categoryId))
+    const filteredData = { order: { ...order, details: filteredDetails }, status }
+    pendingOrder.push(filteredData)
+  }
   return res.send({ pendingOrder })
 })
 
